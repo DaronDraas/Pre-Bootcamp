@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import csv
 
 baseUrl = "https://listado.mercadolibre.cl"
 searchUrl = "https://listado.mercadolibre.cl/inmuebles/departamentos/arriendo/_Desde_{}"
@@ -81,4 +82,4 @@ for link in productlinks:
 
 df = pd.DataFrame(lista_arriendos)
 print(df)
-df.to_csv('Arriendosv2.csv', index=False)
+df.to_csv('Arriendosv_ML.csv', index=False, quoting=csv.QUOTE_ALL, encoding='utf-8', sep=';')
