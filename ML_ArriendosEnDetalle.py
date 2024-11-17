@@ -45,7 +45,7 @@ while True:
     
     page += 1
 
-print(f"Total product links: {len(productlinks)}")
+print(f"Total Page links: {len(productlinks)}")
 productlinks_list = list(productlinks)
 print(productlinks_list)
 
@@ -55,10 +55,10 @@ for link in productlinks:
     if r.status_code != 200:
         continue  # Si hay un error en la solicitud, omitir este link
     soup = BeautifulSoup(r.content, "lxml")
-    productitem = soup.find_all("a", class_="ui-search-link__title-card ui-search-link")
+    productitem = soup.find_all("a", class_="")
     for link in productitem:
         href = link.get("href", "")
-        if href:
+        if href.startswith("https://"):  # Filtrar enlaces válidos
             lista_arriendos.append(href)
 
 lista_arriendos_lista = list(lista_arriendos)
@@ -79,9 +79,18 @@ for link in lista_arriendos:
             description = ""
 
         try:
-            location = item.find("a", class_="ui-pdp-color--BLUE ui-pdp-size--XSMALL ui-pdp-family--REGULAR ui-pdp-seller-validated__title").text.strip()
+            # Obtener todos los elementos "p" con la clase específica en el item
+            media_items = item.find_all("p", class_="ui-pdp-color--BLACK ui-pdp-size--SMALL ui-pdp-family--REGULAR ui-pdp-media__title")
+            
+            # Verificar si hay al menos 4 elementos y tomar el cuarto (índice 3)
+            if len(media_items) >= 4:
+                location = media_items[3].text.strip()
+            else:
+                location = ""
         except AttributeError:
             location = ""
+        except IndexError:
+            location = ""  # Si no hay cuarto elemento, asignar vacío
 
         try:
             price = item.find("span", class_="andes-money-amount__fraction").text.strip()
@@ -98,5 +107,5 @@ for link in lista_arriendos:
         print(f"Saving: {arriendo['description']}, {arriendo['location']}, {arriendo['price']}")
 
 df = pd.DataFrame(detalle_vivienda)
-print(df)
-#df.to_csv('Arriendos_detalle.csv', index=False, quoting=csv.QUOTE_ALL, encoding='utf-8', sep=';')
+#print(df)
+df.to_csv('Arriendos_detalle_161124.csv', index=False, quoting=csv.QUOTE_ALL, encoding='utf-8', sep=';')
